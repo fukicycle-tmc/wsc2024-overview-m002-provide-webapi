@@ -31,7 +31,7 @@ public sealed class QRCodeController : ControllerBase
         }
         if (payment.PaymentDateTime.HasValue)
         {
-            return BadRequest($"This payment have already purchased.");
+            return BadRequest($"This payment has already been completed.");
         }
         if (HttpContext.Request.Headers.TryGetValue("Access-Token", out var values))
         {

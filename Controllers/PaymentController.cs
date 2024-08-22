@@ -45,7 +45,7 @@ public sealed class PaymentController : ControllerBase
     {
         if (!_db.Payments.Any(a => a.Id == paymentId && a.PaymentDateTime == null))
         {
-            return BadRequest("This payment have already purchased.");
+            return BadRequest("This payment has already been completed.");
         }
         if (string.IsNullOrEmpty(accessToken))
         {
@@ -98,7 +98,7 @@ public sealed class PaymentController : ControllerBase
         }
         if (cart.PaymentId.HasValue)
         {
-            return BadRequest($"This payment have already purchased.");
+            return BadRequest($"This payment has already been completed.");
         }
         if ((paymentRequestDTO.Price + paymentRequestDTO.UsedPoints ?? 0) != paymentRequestDTO.PaymentDetails.Sum(a => a.Price * a.Amount))
         {
