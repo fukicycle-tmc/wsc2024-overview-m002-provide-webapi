@@ -82,6 +82,10 @@ public sealed class PaymentController : ControllerBase
         {
             return BadRequest($"No such cart. ID:{paymentRequestDTO.CartId}");
         }
+        if (cart.PaymentId.HasValue)
+        {
+            return BadRequest($"This payment have already purchased.");
+        }
         if ((paymentRequestDTO.Price + paymentRequestDTO.UsedPoints ?? 0) != paymentRequestDTO.PaymentDetails.Sum(a => a.Price))
         {
             return BadRequest($"Price is miss match.");
@@ -108,7 +112,7 @@ public sealed class PaymentController : ControllerBase
             _db.PaymentDetails.Add(paymentDetail);
         }
         cart.PaymentId = payment.Id;
-        if (paymentRequestDTO.UsedPoints.HasValue)
+        if (paymentRequestDTO.UsedPoints.HasValue && paymentRequestDTO.UsedPoints.Value > 0)
         {
             UserPointHistory userPointHistory = new UserPointHistory
             {
