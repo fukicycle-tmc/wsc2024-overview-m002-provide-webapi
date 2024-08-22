@@ -15,9 +15,13 @@ public partial class Recipe
 
     public int Minutes { get; set; }
 
+    public int RecipeTypeId { get; set; }
+
     public virtual Product Product { get; set; } = null!;
 
     public virtual ICollection<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
 
     public virtual ICollection<RecipeKeyPoint> RecipeKeyPoints { get; set; } = new List<RecipeKeyPoint>();
+
+    public virtual RecipeType RecipeType { get; set; } = null!;
 }

@@ -86,7 +86,7 @@ public sealed class PaymentController : ControllerBase
         {
             return BadRequest($"This payment have already purchased.");
         }
-        if ((paymentRequestDTO.Price + paymentRequestDTO.UsedPoints ?? 0) != paymentRequestDTO.PaymentDetails.Sum(a => a.Price))
+        if ((paymentRequestDTO.Price + paymentRequestDTO.UsedPoints ?? 0) != paymentRequestDTO.PaymentDetails.Sum(a => a.Price * a.Amount))
         {
             return BadRequest($"Price is miss match.");
         }
@@ -107,7 +107,8 @@ public sealed class PaymentController : ControllerBase
                 PaymentId = payment.Id,
                 ProductId = paymentDetailRequestDTO.ProductId,
                 OriginalPrice = paymentDetailRequestDTO.Price,
-                DiscountPrice = paymentDetailRequestDTO.DiscountPrice
+                DiscountPrice = paymentDetailRequestDTO.DiscountPrice,
+                Amount = paymentDetailRequestDTO.Amount
             };
             _db.PaymentDetails.Add(paymentDetail);
         }

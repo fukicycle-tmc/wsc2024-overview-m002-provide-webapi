@@ -57,6 +57,8 @@ public partial class DB : DbContext
 
     public virtual DbSet<RecipeKeyPoint> RecipeKeyPoints { get; set; }
 
+    public virtual DbSet<RecipeType> RecipeTypes { get; set; }
+
     public virtual DbSet<Review> Reviews { get; set; }
 
     public virtual DbSet<ReviewDetail> ReviewDetails { get; set; }
@@ -395,6 +397,11 @@ public partial class DB : DbContext
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Recipes_Product");
+
+            entity.HasOne(d => d.RecipeType).WithMany(p => p.Recipes)
+                .HasForeignKey(d => d.RecipeTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Recipes_RecipeTypes");
         });
 
         modelBuilder.Entity<RecipeIngredient>(entity =>
@@ -424,6 +431,15 @@ public partial class DB : DbContext
                 .HasForeignKey(d => d.RecipeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_RecipeKeyPoints_Recipe");
+        });
+
+        modelBuilder.Entity<RecipeType>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__RecipeTy__3214EC07ACF630DF");
+
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<Review>(entity =>
