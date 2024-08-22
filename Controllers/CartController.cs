@@ -96,7 +96,7 @@ public sealed class CartController : ControllerBase
                                                     .Where(a => a.CartId == cartId);
         return Ok(cartProducts.Select(a =>
             new CartProductResponseDTO(
-                a.Id,
+                a.ProductId,
                 a.Product.Title,
                 Convert.ToBase64String(a.Product.Icon),
                 a.Product.Price,
