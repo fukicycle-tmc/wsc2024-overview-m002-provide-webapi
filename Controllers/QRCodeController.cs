@@ -11,9 +11,11 @@ namespace provide_webapi.Controllers;
 public sealed class QRCodeController : ControllerBase
 {
     private readonly DB _db;
-    public QRCodeController(DB db)
+    private readonly InMemoryPaymentCache _inMemoryPaymentCache;
+    public QRCodeController(DB db, InMemoryPaymentCache inMemoryPaymentCache)
     {
         _db = db;
+        _inMemoryPaymentCache = inMemoryPaymentCache;
     }
 
     [HttpPost]
@@ -33,14 +35,17 @@ public sealed class QRCodeController : ControllerBase
         }
         if (HttpContext.Request.Headers.TryGetValue("Access-Token", out var values))
         {
-            string uri = $"http://0.0.0.0:5000/api/v1/payments/{paymentId}?accessToken={values}";
+            Guid tmpGuid = Guid.NewGuid();
+            string uri = $"http://0.0.0.0:5000/api/v1/payments/{paymentId}?accessToken={values}&key={tmpGuid}";
+            _inMemoryPaymentCache.Add(paymentId, tmpGuid);
             using (QRCodeGenerator qrGenerator = new QRCodeGenerator())
             using (QRCodeData qRCodeData = qrGenerator.CreateQrCode(uri, QRCodeGenerator.ECCLevel.Q))
             using (PngByteQRCode qrCode = new PngByteQRCode(qRCodeData))
             {
+                System.IO.File.WriteAllBytes("qrcode.png", qrCode.GetGraphic(20));
                 return Ok(new QRCodeResponseDTO(qrCode.GetGraphic(20), uri));
             }
         }
-        return Unauthorized();
+        return Unauthorized("You have to include 'Access-Token' header.");
     }
 }

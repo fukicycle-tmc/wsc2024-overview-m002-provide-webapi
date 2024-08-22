@@ -13,8 +13,10 @@ namespace provide_webapi.Controllers;
 public sealed class PaymentController : ControllerBase
 {
     private readonly DB _db;
-    public PaymentController(DB db)
+    private readonly InMemoryPaymentCache _inMemoryPaymentCache;
+    public PaymentController(DB db, InMemoryPaymentCache inMemoryPaymentCache)
     {
+        _inMemoryPaymentCache = inMemoryPaymentCache;
         _db = db;
     }
 
@@ -39,7 +41,7 @@ public sealed class PaymentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult CompletePayment(Guid paymentId, [FromQuery] string? accessToken = null)
+    public IActionResult CompletePayment(Guid paymentId, [FromQuery] string? accessToken = null, [FromQuery] Guid? key = null)
     {
         if (!_db.Payments.Any(a => a.Id == paymentId && a.PaymentDateTime == null))
         {
@@ -48,6 +50,18 @@ public sealed class PaymentController : ControllerBase
         if (string.IsNullOrEmpty(accessToken))
         {
             return BadRequest("You must include access token.");
+        }
+        if (key == null)
+        {
+            return BadRequest("You must include key.");
+        }
+        if (_inMemoryPaymentCache.Verify(paymentId, key.Value))
+        {
+            _inMemoryPaymentCache.Remove(paymentId);
+        }
+        else
+        {
+            return BadRequest("Your request is invalid. Please try again.");
         }
         UserToken? userToken = _db.UserTokens.FirstOrDefault(a => a.Token == accessToken && a.ExpiredDate >= DateTime.UtcNow);
         if (userToken == default)
