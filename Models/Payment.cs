@@ -19,7 +19,7 @@ public partial class Payment
 
     public int UserId { get; set; }
 
-    public virtual Cart? Cart { get; set; }
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
     public virtual Coupon? Coupon { get; set; }
 

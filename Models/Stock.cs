@@ -9,9 +9,9 @@ public partial class Stock
 
     public int IngredientId { get; set; }
 
-    public int Amount { get; set; }
-
     public int RequiredStockAmount { get; set; }
 
     public virtual Ingredient Ingredient { get; set; } = null!;
+
+    public virtual ICollection<StockDetail> StockDetails { get; set; } = new List<StockDetail>();
 }

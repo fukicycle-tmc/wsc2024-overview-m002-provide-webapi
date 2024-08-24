@@ -28,10 +28,9 @@ public sealed class CouponController : ControllerBase
         var userId = HttpContext.GetUserId();
         var today = DateTime.Today;
         var coupon = _db.Payments.Include(a => a.UserOrder)
-            .Include(a => a.Cart)
             .ToList()
             .FirstOrDefault(a => (a.UserOrder?.UserId == userId ||
-                                a.Cart?.UserId == userId) &&
+                                a.UserId == userId) &&
                                 a.CouponId.HasValue &&
                                 a.PaymentDateTime.HasValue &&
                                 a.PaymentDateTime.Value.Year == today.Year &&

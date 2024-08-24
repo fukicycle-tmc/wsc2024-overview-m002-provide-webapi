@@ -75,11 +75,9 @@ public partial class DB : DbContext
 
     public virtual DbSet<Stock> Stocks { get; set; }
 
+    public virtual DbSet<StockDetail> StockDetails { get; set; }
+
     public virtual DbSet<Stofe> Stoves { get; set; }
-
-    public virtual DbSet<Store> Stores { get; set; }
-
-    public virtual DbSet<StoreEmployee> StoreEmployees { get; set; }
 
     public virtual DbSet<StoveAllocation> StoveAllocations { get; set; }
 
@@ -122,10 +120,10 @@ public partial class DB : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Carts__3214EC071169F519");
 
-            entity.HasIndex(e => e.PaymentId, "UQ_Carts_PaymentId").IsUnique();
+            entity.HasIndex(e => new { e.PaymentId, e.UserId }, "UQ_Carts_PaymentId").IsUnique();
 
-            entity.HasOne(d => d.Payment).WithOne(p => p.Cart)
-                .HasForeignKey<Cart>(d => d.PaymentId)
+            entity.HasOne(d => d.Payment).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.PaymentId)
                 .HasConstraintName("FK_Carts_Payment");
 
             entity.HasOne(d => d.User).WithMany(p => p.Carts)
@@ -275,10 +273,15 @@ public partial class DB : DbContext
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.DateTime).HasColumnType("datetime");
 
-            entity.HasOne(d => d.Store).WithMany(p => p.IngredientOrders)
-                .HasForeignKey(d => d.StoreId)
+            entity.HasOne(d => d.ResponsibleParty).WithMany(p => p.IngredientOrders)
+                .HasForeignKey(d => d.ResponsiblePartyId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_IngredientOrders_Store");
+                .HasConstraintName("FK_IngredientOrders_Employees");
+
+            entity.HasOne(d => d.Supplier).WithMany(p => p.IngredientOrders)
+                .HasForeignKey(d => d.SupplierId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IngredientOrders_Suppliers");
         });
 
         modelBuilder.Entity<IngredientOrderDelivery>(entity =>
@@ -376,7 +379,6 @@ public partial class DB : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Products__3214EC0731D1550F");
 
             entity.Property(e => e.Description).HasColumnType("text");
-            entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -544,6 +546,16 @@ public partial class DB : DbContext
                 .HasConstraintName("FK_Stocks_Ingredient");
         });
 
+        modelBuilder.Entity<StockDetail>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__StockDet__3214EC07E46B468F");
+
+            entity.HasOne(d => d.Stock).WithMany(p => p.StockDetails)
+                .HasForeignKey(d => d.StockId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_StockDetails_Stock");
+        });
+
         modelBuilder.Entity<Stofe>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Stoves__3214EC072AC282CB");
@@ -551,31 +563,6 @@ public partial class DB : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<Store>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__Stores__3214EC0789E40C7B");
-
-            entity.Property(e => e.Address).HasColumnType("text");
-            entity.Property(e => e.Name)
-                .HasMaxLength(100)
-                .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<StoreEmployee>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__StoreEmp__3214EC07D96E34E6");
-
-            entity.HasOne(d => d.Employee).WithMany(p => p.StoreEmployees)
-                .HasForeignKey(d => d.EmployeeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_StoreEmployees_Employee");
-
-            entity.HasOne(d => d.Store).WithMany(p => p.StoreEmployees)
-                .HasForeignKey(d => d.StoreId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_StoreEmployees_Store");
         });
 
         modelBuilder.Entity<StoveAllocation>(entity =>

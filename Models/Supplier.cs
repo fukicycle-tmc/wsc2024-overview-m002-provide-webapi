@@ -11,6 +11,8 @@ public partial class Supplier
 
     public string Address { get; set; } = null!;
 
+    public virtual ICollection<IngredientOrder> IngredientOrders { get; set; } = new List<IngredientOrder>();
+
     public virtual ICollection<SupplierIngredientPrice> SupplierIngredientPrices { get; set; } = new List<SupplierIngredientPrice>();
 
     public virtual ICollection<Warehouse> Warehouses { get; set; } = new List<Warehouse>();

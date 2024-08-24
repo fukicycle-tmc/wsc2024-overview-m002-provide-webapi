@@ -19,11 +19,11 @@ public partial class Employee
 
     public virtual ICollection<CookingPlan> CookingPlans { get; set; } = new List<CookingPlan>();
 
+    public virtual ICollection<IngredientOrder> IngredientOrders { get; set; } = new List<IngredientOrder>();
+
     public virtual Role Role { get; set; } = null!;
 
     public virtual ICollection<Shifting> Shiftings { get; set; } = new List<Shifting>();
-
-    public virtual ICollection<StoreEmployee> StoreEmployees { get; set; } = new List<StoreEmployee>();
 
     public virtual ICollection<UserDeliveryPlan> UserDeliveryPlans { get; set; } = new List<UserDeliveryPlan>();
 }
