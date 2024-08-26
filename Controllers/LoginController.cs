@@ -9,7 +9,11 @@ namespace provide_webapi.Controllers;
 [Route("/api/v1/login")]
 public sealed class LoginController : ControllerBase
 {
+    #if DEBUG
     private const int EXPIRED_MINUTE = 60;
+    #else
+    private const int EXPIRED_MINUTE = 10;
+    #endif
     private readonly DB _db;
     public LoginController(DB db)
     {
